@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f7f8" />
+    <title>상권 위치 선택</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="상권 위치 선택 홈">
+          <span class="brand-mark" aria-hidden="true">⌖</span>
+          <span>상권 위치 선택</span>
+        </a>
+        <span class="stage-label"><span class="stage-dot"></span> 위치 탐색</span>
+      </header>
+
+      <section class="workspace" aria-label="지도에서 위치 선택">
+        <aside class="sidebar">
+          <div class="intro">
+            <p class="eyebrow">LOCATION EXPLORER</p>
+            <h1>어디를 살펴볼까요?</h1>
+            <p class="intro-copy">지도에서 직접 선택하거나 주소를 검색해 위치를 찾아보세요.</p>
+          </div>
+
+          <form id="search-form" class="search-form">
+            <label for="address-input">주소 검색</label>
+            <div class="search-control">
+              <input id="address-input" type="search" placeholder="예: 경기도 안양시 동안구 시민대로" autocomplete="street-address" />
+              <button id="search-button" type="submit" aria-label="주소 검색">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"></circle><path d="m15.5 15.5 4.2 4.2"></path></svg>
+              </button>
+            </div>
+            <p class="search-hint">도로명 또는 지번 주소를 입력해 주세요.</p>
+          </form>
+
+          <section class="selection-card" aria-labelledby="selection-title">
+            <div class="card-heading">
+              <span class="pin-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 10c0 5.2-8 11-8 11S4 15.2 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="2.5"></circle></svg></span>
+              <h2 id="selection-title">선택한 위치</h2>
+            </div>
+            <p id="selection-address" class="selection-address empty">지도에서 위치를 선택해 주세요.</p>
+            <div class="coordinate-row"><span>행정동</span><strong id="dong-name">—</strong></div>
+            <div class="coordinate-row"><span>상권</span><strong id="commercial-area">—</strong></div>
+            <div class="coordinate-row"><span>상권 ID</span><strong id="commercial-area-id">—</strong></div>
+            <div class="coordinate-row"><span>위도</span><strong id="latitude">—</strong></div>
+            <div class="coordinate-row"><span>경도</span><strong id="longitude">—</strong></div>
+          </section>
+
+          <div id="notice" class="notice" role="status" aria-live="polite">
+            <span class="notice-icon" aria-hidden="true">i</span>
+            <p id="notice-text">카카오맵을 불러오는 중입니다.</p>
+          </div>
+
+          <div class="scope-note"><span class="scope-icon" aria-hidden="true">◎</span><p>행정동 경계 안에서 선택할 수 있습니다. 주황·보라색은 자료에 포함된 골목·발달 상권 경계입니다.</p></div>
+
+          <footer class="sidebar-footer"><span>LOCATION · GYEONGGI-DO</span><span>MAP DATA BY KAKAO</span></footer>
+        </aside>
+
+        <section class="map-panel" aria-label="카카오 지도">
+          <div id="map" role="application" aria-label="위치를 선택할 수 있는 지도"></div>
+          <div id="map-loading" class="map-overlay" aria-live="polite">
+            <span class="spinner" aria-hidden="true"></span>
+            <p id="map-loading-text">지도를 준비하고 있습니다</p>
+            <small>잠시만 기다려 주세요.</small>
+          </div>
+          <div class="map-tip"><span class="tip-dot"></span> 지도를 클릭해 위치 선택</div>
+          <div class="map-attribution">ⓒ Kakao</div>
+        </section>
+      </section>
+    </main>
+    <script src="config.js"></script>
+    <script src="app.js" defer></script>
+  </body>
+</html>
