@@ -1,5 +1,5 @@
 config.js
-/data/상권/소상공인시장진흥공단_상가(상권)정보_경기_*.csv
+*.csv
 
 # macOS
 .DS_Store
