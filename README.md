@@ -5,7 +5,7 @@
 ## 실행 방법
 
 1. 카카오디벨로퍼스에서 앱을 만들고 **JavaScript 키**를 확인합니다.
-2. `config.example.js`를 복사해 `config.js`를 만들고 `YOUR_KAKAO_JAVASCRIPT_KEY`를 발급받은 JavaScript 키로 바꿉니다. `config.js`는 Git에 포함되지 않습니다.
+2. `config.example.js`를 복사해 `config.js`를 만들고 `YOUR_KAKAO_JAVASCRIPT_KEY`를 발급받은 JavaScript 키로 바꿉니다. `config.js`와 `.csv`는 Git에 포함되지 않습니다.
 3. 프로젝트 루트에서 정적 웹 서버를 실행합니다. 예: `python3 -m http.server 8000`
 4. 브라우저에서 `http://localhost:8000`을 엽니다.
 
