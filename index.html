@@ -2,17 +2,40 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#101a32" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f7f9fc" />
+    <script>
+      (() => {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const systemTheme = prefersDark ? 'dark' : 'light';
+        let theme = systemTheme;
+        try {
+          const savedTheme = window.localStorage.getItem('mildang-theme');
+          if (savedTheme === 'dark' || savedTheme === 'light') theme = savedTheme;
+        } catch (error) {
+          console.error('Unable to read saved theme preference:', error);
+        }
+        document.documentElement.dataset.theme = theme;
+        document.querySelector('meta[name="theme-color"]').content =
+          theme === 'dark' ? '#0c1422' : '#f7f9fc';
+      })();
+    </script>
     <title>밀당 | 창업 입지 분석</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="studio-shell">
       <header class="studio-header">
-        <a class="brand" href="./" aria-label="밀당 홈"><span class="brand-push">밀</span><span class="brand-pull">당</span></a>
-        <div class="studio-product"><span aria-hidden="true"></span> 창업 입지 분석 스튜디오</div>
+        <a class="brand brand-intro" href="./" aria-label="밀당 홈. 손님은 밀려오고, 정보는 당겨오고!">
+          <span class="brand-compact" aria-hidden="true"><span class="brand-push">밀</span><span class="brand-pull">당</span></span>
+          <span class="brand-slogan" aria-hidden="true">손님은 <span class="brand-slogan-push">밀</span>려오고, 정보는 <span class="brand-slogan-pull">당</span>겨오고!</span>
+        </a>
+        <div class="studio-product"><span aria-hidden="true"></span> 창업 컨설턴트</div>
         <div class="studio-region">안양시 · 위치 탐색</div>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="다크 모드로 전환" title="다크 모드로 전환">
+          <span id="theme-icon" class="theme-toggle-icon" aria-hidden="true">☾</span>
+          <span id="theme-label" class="theme-toggle-label">다크 모드</span>
+        </button>
       </header>
 
       <main class="studio-workspace">
@@ -42,14 +65,25 @@
               <label for="industry">창업 업종 <span class="required">*</span></label>
               <div class="input-wrap">
                 <select id="industry">
-                  <option value="cafe">카페 · 디저트</option>
-                  <option value="korean">한식 음식점</option>
-                  <option value="chicken">치킨 · 패스트푸드</option>
-                  <option value="snack">분식 · 간편식</option>
+                  <option value="korean">한식</option>
+                  <option value="japanese">일식</option>
+                  <option value="chinese">중식</option>
+                  <option value="chicken">치킨</option>
+                  <option value="pizza">피자</option>
+                  <option value="burger">햄버거</option>
                 </select>
                 <span class="field-chevron" aria-hidden="true">⌄</span>
               </div>
-              <small class="field-help">업종별 가상 예측 결과를 확인합니다.</small>
+              <small class="field-help">업종 카테고리를 선택해 주세요.</small>
+            </div>
+
+            <div class="field-group" id="subcategory-group" hidden>
+              <label for="subcategory">세부 업종 <span class="required">*</span></label>
+              <div class="input-wrap">
+                <select id="subcategory"></select>
+                <span class="field-chevron" aria-hidden="true">⌄</span>
+              </div>
+              <small class="field-help">선택한 세부 업종의 가상 예측 결과를 확인합니다.</small>
             </div>
 
             <div class="field-group">
@@ -63,14 +97,15 @@
             </div>
 
             <form id="search-form" class="search-form">
-              <label for="address-input">주소 검색</label>
+              <label for="address-input">주소 또는 장소 검색</label>
               <div class="search-control">
-                <input id="address-input" type="search" placeholder="예: 경기도 안양시 동안구 시민대로" autocomplete="street-address" />
-                <button id="search-button" type="submit" aria-label="주소 검색">
+                <input id="address-input" type="search" placeholder="예: 범계역, 안양시청, 평촌 카페" autocomplete="off" />
+                <button id="search-button" type="submit" aria-label="주소 또는 장소 검색">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"></circle><path d="m15.5 15.5 4.2 4.2"></path></svg>
                 </button>
               </div>
-              <small class="field-help">안양시 안의 주소를 검색하거나 지도에서 위치를 선택하세요.</small>
+              <div id="search-results" class="search-results" role="group" aria-label="검색 결과" aria-live="polite" aria-busy="false" hidden></div>
+              <small class="field-help">장소명·역명·주소 등으로 검색한 뒤 최대 5개 결과 중 하나를 선택하세요.</small>
             </form>
 
             <div class="quick-locations">
@@ -153,9 +188,9 @@
         <p class="studio-map-hint">행정동 경계 안에서 위치를 선택할 수 있습니다. 상권 경계와 연결된 매출 ID를 함께 표시합니다.</p>
 
         <section class="studio-tray" aria-label="비교할 예측 결과">
-          <div class="studio-tray-heading"><span>COMPARE</span><strong>비교 목록 <small id="candidate-count">0 / 3</small></strong></div>
+          <div class="studio-tray-heading"><span>COMPARE</span><strong>비교 목록 <small id="candidate-count">0개</small></strong></div>
           <div id="candidate-list" class="studio-tray-items">
-            <div class="studio-tray-empty">분석 결과를 담아보세요.<span>같은 업종·반경의 후보지를 최대 3개까지 비교할 수 있어요.</span></div>
+            <div class="studio-tray-empty">분석 결과를 담아보세요.<span>업종·반경과 관계없이 최대 3개까지 담을 수 있습니다.</span></div>
           </div>
           <button id="compare-button" class="studio-compare-button" type="button" disabled>▤ 비교하기 <span aria-hidden="true">→</span></button>
         </section>

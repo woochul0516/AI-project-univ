@@ -1,7 +1,50 @@
+export const INDUSTRY_CATEGORIES = Object.freeze([
+  {
+    code: 'korean',
+    label: '한식',
+    subcategories: [
+      { code: 'korean-home-meal', label: '백반•가정식' },
+      { code: 'korean-soup', label: '국밥•탕' },
+      { code: 'korean-grill', label: '고기•구이' },
+      { code: 'korean-jokbal-bossam', label: '족발•보쌈' },
+      { code: 'snack', label: '분식' },
+    ],
+  },
+  {
+    code: 'japanese',
+    label: '일식',
+    subcategories: [
+      { code: 'japanese-sushi', label: '초밥' },
+      { code: 'japanese-tonkatsu', label: '돈까스' },
+      { code: 'japanese-ramen-udon', label: '라멘•우동' },
+    ],
+  },
+  {
+    code: 'chinese',
+    label: '중식',
+    subcategories: [
+      { code: 'chinese-jajang-jjamppong', label: '짜장•짬뽕' },
+      { code: 'chinese-malatang', label: '마라탕' },
+    ],
+  },
+  { code: 'chicken', label: '치킨', subcategories: [] },
+  { code: 'pizza', label: '피자', subcategories: [] },
+  { code: 'burger', label: '햄버거', subcategories: [] },
+]);
+
+const categoryIndustries = INDUSTRY_CATEGORIES.flatMap(category =>
+  category.subcategories.length
+    ? category.subcategories.map(subcategory => ({
+      code: subcategory.code,
+      label: `${category.label} · ${subcategory.label}`,
+    }))
+    : [{ code: category.code, label: category.label }],
+);
+
 export const INDUSTRIES = Object.freeze([
+  ...categoryIndustries,
   { code: 'cafe', label: '카페 · 디저트' },
   { code: 'korean', label: '한식 음식점' },
-  { code: 'chicken', label: '치킨 · 패스트푸드' },
   { code: 'snack', label: '분식 · 간편식' },
 ]);
 
@@ -9,7 +52,25 @@ export const RADII = Object.freeze([300, 500, 1000]);
 export const MAX_CANDIDATES = 3;
 export const STORAGE_KEY = 'mildang-root-comparison-v1';
 
-const INDUSTRY_FACTORS = Object.freeze({ cafe: 1, korean: 1.21, chicken: 0.86, snack: 0.79 });
+const INDUSTRY_FACTORS = Object.freeze({
+  'korean-home-meal': 1.21,
+  'korean-soup': 1.21,
+  'korean-grill': 1.21,
+  'korean-jokbal-bossam': 1.21,
+  'japanese-sushi': 1.08,
+  'japanese-tonkatsu': 1.08,
+  'japanese-ramen-udon': 1.08,
+  'chinese-jajang-jjamppong': 1.15,
+  'chinese-malatang': 1.15,
+  'snack-tteokbokki': 0.79,
+  'snack-gimbap': 0.79,
+  chicken: 0.86,
+  pizza: 1.03,
+  burger: 0.92,
+  cafe: 1,
+  korean: 1.21,
+  snack: 0.79,
+});
 const METRICS = Object.freeze([
   { key: 'sales', label: '예상 월매출', unit: '원' },
   { key: 'foot_traffic', label: '일평균 유동인구', unit: '명/일' },
@@ -179,9 +240,8 @@ export function filterCandidates(candidates, filters) {
 
 export function addCandidate(candidates, candidate) {
   if (!isCandidate(candidate)) throw new Error('저장할 분석 결과의 형식이 올바르지 않습니다.');
-  const matching = filterCandidates(candidates, candidate);
-  if (matching.length >= MAX_CANDIDATES) {
-    throw new Error('같은 업종·반경에서는 후보지를 최대 3개까지 저장할 수 있습니다.');
+  if (candidates.length >= MAX_CANDIDATES) {
+    throw new Error('비교 목록에는 후보지를 최대 3개까지 담을 수 있습니다.');
   }
   if (candidates.some(item => sameCandidatePlace(item, candidate))) {
     throw new Error('같은 조건과 가까운 위치의 후보지가 이미 저장되어 있습니다.');

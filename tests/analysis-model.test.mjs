@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  STORAGE_KEY, addCandidate, analyzeLocation, filterCandidates, formatWonToManwon,
+  INDUSTRIES, INDUSTRY_CATEGORIES, STORAGE_KEY, addCandidate, analyzeLocation, createCandidate, filterCandidates, formatWonToManwon,
   generateReport, readCandidates, sameCandidatePlace, writeCandidates,
 } from '../analysis-model.mjs';
 
@@ -30,13 +30,56 @@ function memoryStorage() {
   };
 }
 
-test('같은 업종·반경 후보지만 비교하고 조건별 3개 상한을 적용한다', () => {
-  const cafe = [candidate('1'), candidate('2'), candidate('3')];
-  assert.equal(filterCandidates([...cafe, candidate('4', { industry: 'korean' })], {
-    industry: 'cafe', radius: 500, mock: true,
-  }).length, 3);
-  assert.throws(() => addCandidate(cafe, candidate('4')), /최대 3개/);
-  assert.equal(addCandidate(cafe, candidate('4', { radius: 1000 })).length, 4);
+test('창업 업종 대분류와 세부 업종을 분석 코드로 지원한다', async () => {
+  assert.deepEqual(INDUSTRY_CATEGORIES.map(category => [
+    category.label,
+    category.subcategories.map(subcategory => subcategory.label),
+  ]), [
+    ['한식', ['백반•가정식', '국밥•탕', '고기•구이', '족발•보쌈', '분식']],
+    ['일식', ['초밥', '돈까스', '라멘•우동']],
+    ['중식', ['짜장•짬뽕', '마라탕']],
+    ['치킨', []],
+    ['피자', []],
+    ['햄버거', []],
+  ]);
+  const industryCodes = INDUSTRY_CATEGORIES.flatMap(category =>
+    category.subcategories.map(subcategory => subcategory.code)
+      .concat(category.subcategories.length ? [] : category.code));
+  const results = await Promise.all(industryCodes.map(industry => analyzeLocation({
+    industry, latitude: 37.39, longitude: 126.95, radius: 500,
+  })));
+  assert.equal(results.length, 13);
+  assert.ok(results.every(result => result.mock && result.radius === 500));
+  assert.equal(INDUSTRIES.find(industry => industry.code === 'japanese-sushi')?.label, '일식 · 초밥');
+
+  const context = {
+    location: { name: '범계역 일대', lat: 37.39, lng: 126.95 },
+    industry: 'japanese-sushi',
+    radius: 500,
+  };
+  const sushiResult = results[industryCodes.indexOf(context.industry)];
+  const sushiCandidate = createCandidate(sushiResult, context);
+  const saved = addCandidate([], sushiCandidate);
+  assert.equal(saved[0].industry, context.industry);
+  assert.equal(filterCandidates(saved, { ...context, mock: true }).length, 1);
+  assert.equal(filterCandidates(saved, { ...context, industry: 'japanese-tonkatsu', mock: true }).length, 0);
+  const report = await generateReport(context);
+  assert.match(report.strengths, /일식 · 초밥/);
+});
+
+test('비교 목록은 조건과 무관하게 최대 3개까지 담을 수 있다', () => {
+  const saved = [
+    candidate('1'),
+    candidate('2', { industry: 'korean' }),
+    candidate('3', { radius: 1000 }),
+  ];
+  assert.equal(filterCandidates(saved, { industry: 'cafe', radius: 500, mock: true }).length, 1);
+  assert.equal(addCandidate(saved.slice(0, 2), candidate('4', {
+    industry: 'pizza', radius: 300,
+  })).length, 3);
+  assert.throws(() => addCandidate(saved, candidate('4', {
+    industry: 'pizza', radius: 300,
+  })), /비교 목록에는 후보지를 최대 3개/);
 });
 
 test('같은 조건의 근접 좌표 중복 저장을 막는다', () => {
