@@ -3,75 +3,189 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f5f7f8" />
-    <title>상권 위치 선택</title>
+    <meta name="theme-color" content="#101a32" />
+    <title>밀당 | 창업 입지 분석</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <main class="app-shell">
-      <header class="topbar">
-        <a class="brand" href="./" aria-label="상권 위치 선택 홈">
-          <span class="brand-mark" aria-hidden="true">⌖</span>
-          <span>상권 위치 선택</span>
-        </a>
-        <span class="stage-label"><span class="stage-dot"></span> 위치 탐색</span>
+    <div class="studio-shell">
+      <header class="studio-header">
+        <a class="brand" href="./" aria-label="밀당 홈"><span class="brand-push">밀</span><span class="brand-pull">당</span></a>
+        <div class="studio-product"><span aria-hidden="true"></span> 창업 입지 분석 스튜디오</div>
+        <div class="studio-region">안양시 · 위치 탐색</div>
       </header>
 
-      <section class="workspace" aria-label="지도에서 위치 선택">
-        <aside class="sidebar">
-          <div class="intro">
-            <p class="eyebrow">LOCATION EXPLORER</p>
-            <h1>어디를 살펴볼까요?</h1>
-            <p class="intro-copy">지도에서 직접 선택하거나 주소를 검색해 위치를 찾아보세요.</p>
+      <main class="studio-workspace">
+        <section class="studio-map" aria-label="안양시 위치 선택 지도">
+          <div class="map-panel">
+            <div id="map" role="application" aria-label="위치를 선택할 수 있는 카카오 지도"></div>
+            <div id="map-loading" class="map-overlay" aria-live="polite">
+              <span class="spinner" aria-hidden="true"></span>
+              <p id="map-loading-text">지도를 준비하고 있습니다</p>
+              <small>잠시만 기다려 주세요.</small>
+            </div>
+            <div class="map-tip"><span class="tip-dot"></span> 지도를 클릭해 위치 선택</div>
+            <div class="map-attribution">ⓒ Kakao</div>
+          </div>
+        </section>
+
+        <aside class="studio-panel" aria-label="분석 조건과 결과">
+          <div class="studio-panel-title">
+            <span class="studio-eyebrow">LOCATION / INSIGHT</span>
+            <h1>내 가게, 어디가 좋을까요?</h1>
+            <p>업종과 위치를 선택해 창업 입지를 살펴보세요.</p>
+            <span class="mock-banner"><span></span> 분석 결과는 화면 확인용 가상 데이터입니다.</span>
           </div>
 
-          <form id="search-form" class="search-form">
-            <label for="address-input">주소 검색</label>
-            <div class="search-control">
-              <input id="address-input" type="search" placeholder="예: 경기도 안양시 동안구 시민대로" autocomplete="street-address" />
-              <button id="search-button" type="submit" aria-label="주소 검색">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"></circle><path d="m15.5 15.5 4.2 4.2"></path></svg>
-              </button>
+          <div class="studio-panel-content">
+            <div class="field-group">
+              <label for="industry">창업 업종 <span class="required">*</span></label>
+              <div class="input-wrap">
+                <select id="industry">
+                  <option value="cafe">카페 · 디저트</option>
+                  <option value="korean">한식 음식점</option>
+                  <option value="chicken">치킨 · 패스트푸드</option>
+                  <option value="snack">분식 · 간편식</option>
+                </select>
+                <span class="field-chevron" aria-hidden="true">⌄</span>
+              </div>
+              <small class="field-help">업종별 가상 예측 결과를 확인합니다.</small>
             </div>
-            <p class="search-hint">도로명 또는 지번 주소를 입력해 주세요.</p>
-          </form>
 
-          <section class="selection-card" aria-labelledby="selection-title">
-            <div class="card-heading">
-              <span class="pin-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 10c0 5.2-8 11-8 11S4 15.2 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="2.5"></circle></svg></span>
-              <h2 id="selection-title">선택한 위치</h2>
+            <div class="field-group">
+              <div class="field-label-row"><span>상권 분석 반경</span></div>
+              <div class="radius-options" role="group" aria-label="상권 분석 반경">
+                <button type="button" data-radius="300" aria-pressed="false">300m</button>
+                <button type="button" data-radius="500" class="selected" aria-pressed="true">500m</button>
+                <button type="button" data-radius="1000" aria-pressed="false">1km</button>
+              </div>
+              <small class="field-help">선택 위치를 중심으로 살펴볼 범위입니다.</small>
             </div>
-            <p id="selection-address" class="selection-address empty">지도에서 위치를 선택해 주세요.</p>
-            <div class="coordinate-row"><span>행정동</span><strong id="dong-name">—</strong></div>
-            <div class="coordinate-row"><span>상권</span><strong id="commercial-area">—</strong></div>
-            <div class="coordinate-row"><span>상권 ID</span><strong id="commercial-area-id">—</strong></div>
-            <div class="coordinate-row"><span>위도</span><strong id="latitude">—</strong></div>
-            <div class="coordinate-row"><span>경도</span><strong id="longitude">—</strong></div>
-          </section>
 
-          <div id="notice" class="notice" role="status" aria-live="polite">
-            <span class="notice-icon" aria-hidden="true">i</span>
-            <p id="notice-text">카카오맵을 불러오는 중입니다.</p>
+            <form id="search-form" class="search-form">
+              <label for="address-input">주소 검색</label>
+              <div class="search-control">
+                <input id="address-input" type="search" placeholder="예: 경기도 안양시 동안구 시민대로" autocomplete="street-address" />
+                <button id="search-button" type="submit" aria-label="주소 검색">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"></circle><path d="m15.5 15.5 4.2 4.2"></path></svg>
+                </button>
+              </div>
+              <small class="field-help">안양시 안의 주소를 검색하거나 지도에서 위치를 선택하세요.</small>
+            </form>
+
+            <div class="quick-locations">
+              <div class="field-label-row"><span>빠른 위치 선택</span></div>
+              <div class="quick-location-grid">
+                <button type="button" data-lat="37.389" data-lng="126.952" data-name="범계역 일대">범계역 일대</button>
+                <button type="button" data-lat="37.402" data-lng="126.922" data-name="안양역 일대">안양역 일대</button>
+                <button type="button" data-lat="37.394" data-lng="126.964" data-name="평촌역 일대">평촌역 일대</button>
+                <button type="button" data-lat="37.401" data-lng="126.976" data-name="인덕원역 일대">인덕원역 일대</button>
+              </div>
+            </div>
+
+            <section class="selected-summary" aria-labelledby="selected-heading">
+              <span class="selected-summary-icon" aria-hidden="true">⌖</span>
+              <div class="selected-summary-content">
+                <small id="selected-heading">현재 선택 위치</small>
+                <strong id="selection-address" class="empty">지도에서 위치를 선택해 주세요.</strong>
+                <span class="selection-detail"><span>행정동</span><b id="dong-name">—</b></span>
+                <span class="selection-detail"><span>상권</span><b id="commercial-area">—</b></span>
+                <span class="selection-detail"><span>상권 ID</span><b id="commercial-area-id">—</b></span>
+                <span class="coords"><span id="latitude">—</span>, <span id="longitude">—</span></span>
+              </div>
+              <span id="selected-check" class="selected-check" hidden aria-label="위치 선택 완료">✓</span>
+            </section>
+
+            <div id="notice" class="notice" role="status" aria-live="polite">
+              <span class="notice-icon" aria-hidden="true">i</span>
+              <p id="notice-text">카카오맵과 안양시 경계를 불러오고 있습니다.</p>
+            </div>
+
+            <details class="dev-panel">
+              <summary>개발자 테스트 · 오류 상황 확인</summary>
+              <label for="scenario">테스트할 분석 응답</label>
+              <select id="scenario">
+                <option value="success">정상 응답</option>
+                <option value="slow">느린 응답 (2.4초)</option>
+                <option value="data_unavailable">데이터 없음</option>
+                <option value="model_unavailable">모델 오류</option>
+                <option value="server_error">서버 오류</option>
+                <option value="invalid_response">잘못된 JSON 형식</option>
+                <option value="report_error">리포트 오류</option>
+              </select>
+              <p>선택 후 분석 또는 리포트 생성을 눌러 오류 화면을 확인하세요.</p>
+            </details>
+
+            <section id="analysis-result" class="studio-result" aria-label="분석 결과" aria-live="polite" hidden>
+              <div id="analysis-error" class="inline-error" role="alert" hidden>
+                <div><strong>분석에 실패했습니다.</strong><p id="analysis-error-text"></p></div>
+                <button id="retry-analysis" type="button">다시 시도</button>
+              </div>
+              <div id="analysis-loading" class="loading-state" hidden><span class="spinner"></span> 분석 결과를 불러오고 있어요.</div>
+              <div id="analysis-content" hidden>
+                <div class="result-headline-card">
+                  <span class="result-kicker">MONTHLY SALES ESTIMATE</span>
+                  <h2 id="result-title"></h2>
+                  <p id="result-context"></p>
+                  <span class="result-label">예상 월매출 <span class="fake-tag">가상값</span></span>
+                  <div class="headline-number"><span id="monthly-sales"></span><small>만원</small></div>
+                  <button id="save-candidate" class="outline-save" type="button">＋ 비교 목록에 추가</button>
+                </div>
+                <div class="metrics-grid">
+                  <article class="metric-card"><span>주변 경쟁업체</span><strong id="competitor-count">자료 없음</strong><small>선택 반경 기준</small></article>
+                  <article class="metric-card"><span>일평균 유동인구</span><strong id="foot-traffic">자료 없음</strong><small>가상 데이터</small></article>
+                  <article class="metric-card"><span>접근성 지수</span><strong id="accessibility-score">자료 없음</strong><small>가상 데이터</small></article>
+                </div>
+                <p class="result-disclaimer">실제 지역 통계나 학습된 AI 모델의 예측이 아닙니다. 창업 판단에 사용하지 마세요.</p>
+                <button id="open-report" class="report-link" type="button">창업 전략 리포트 열기 <span aria-hidden="true">→</span></button>
+              </div>
+            </section>
           </div>
 
-          <div class="scope-note"><span class="scope-icon" aria-hidden="true">◎</span><p>행정동 경계 안에서 선택할 수 있습니다. 주황·보라색은 자료에 포함된 골목·발달 상권 경계입니다.</p></div>
-
-          <footer class="sidebar-footer"><span>LOCATION · GYEONGGI-DO</span><span>MAP DATA BY KAKAO</span></footer>
+          <div class="studio-panel-actions">
+            <button id="analyze-button" class="primary-button" type="button" disabled>
+              <span class="button-label">입지 분석하기</span><span aria-hidden="true">→</span>
+            </button>
+            <button id="reset-button" class="reset-button" type="button">조건 초기화</button>
+          </div>
         </aside>
 
-        <section class="map-panel" aria-label="카카오 지도">
-          <div id="map" role="application" aria-label="위치를 선택할 수 있는 지도"></div>
-          <div id="map-loading" class="map-overlay" aria-live="polite">
-            <span class="spinner" aria-hidden="true"></span>
-            <p id="map-loading-text">지도를 준비하고 있습니다</p>
-            <small>잠시만 기다려 주세요.</small>
+        <p class="studio-map-hint">행정동 경계 안에서 위치를 선택할 수 있습니다. 상권 경계와 연결된 매출 ID를 함께 표시합니다.</p>
+
+        <section class="studio-tray" aria-label="비교할 예측 결과">
+          <div class="studio-tray-heading"><span>COMPARE</span><strong>비교 목록 <small id="candidate-count">0 / 3</small></strong></div>
+          <div id="candidate-list" class="studio-tray-items">
+            <div class="studio-tray-empty">분석 결과를 담아보세요.<span>같은 업종·반경의 후보지를 최대 3개까지 비교할 수 있어요.</span></div>
           </div>
-          <div class="map-tip"><span class="tip-dot"></span> 지도를 클릭해 위치 선택</div>
-          <div class="map-attribution">ⓒ Kakao</div>
+          <button id="compare-button" class="studio-compare-button" type="button" disabled>▤ 비교하기 <span aria-hidden="true">→</span></button>
         </section>
-      </section>
-    </main>
+      </main>
+
+      <dialog id="comparison-dialog" class="studio-drawer" aria-label="후보지 지표 비교">
+        <div class="studio-drawer-head">
+          <div><span class="studio-eyebrow">SIDE BY SIDE</span><h2>가능성을 비교하세요.</h2><p id="comparison-subtitle"></p></div>
+          <button class="dialog-close" type="button" data-close-dialog="comparison-dialog" aria-label="비교 닫기">×</button>
+        </div>
+        <div id="comparison-content"></div>
+        <p class="studio-drawer-note">가상 데이터로 계산한 상대 비교입니다. 데이터가 없는 지표는 점수에서 제외됩니다.</p>
+      </dialog>
+
+      <dialog id="report-dialog" class="studio-drawer studio-report-drawer" aria-label="창업 전략 리포트">
+        <button class="dialog-close report-close" type="button" data-close-dialog="report-dialog" aria-label="리포트 닫기">×</button>
+        <section class="report-card">
+          <span class="studio-eyebrow">SAMPLE INSIGHT</span>
+          <h2>AI 창업 전략 리포트</h2>
+          <p class="report-intro">분석 결과를 바탕으로 한 화면 확인용 샘플입니다.</p>
+          <div id="report-loading" class="loading-state" hidden><span class="spinner"></span> 리포트를 만들고 있어요.</div>
+          <div id="report-error" class="inline-error" role="alert" hidden><div><strong>리포트를 생성하지 못했습니다.</strong><p id="report-error-text"></p></div></div>
+          <div id="report-content" class="report-content" hidden></div>
+          <button id="generate-report" class="primary-button" type="button">리포트 생성하기 <span aria-hidden="true">→</span></button>
+        </section>
+      </dialog>
+
+      <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    </div>
     <script src="config.js"></script>
-    <script src="app.js" defer></script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>

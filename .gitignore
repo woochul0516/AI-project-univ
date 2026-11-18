@@ -1,5 +1,7 @@
 config.js
 *.csv
+*.pdf
+*.pptx
 
 # macOS
 .DS_Store
